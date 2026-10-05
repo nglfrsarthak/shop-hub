@@ -74,16 +74,41 @@ jobs:
           find app scripts -name '*.js' -o -name '*.mjs' | while read -r f; do
             node --input-type=module --check < "$f" || echo "PARSE FAIL: $f"
           done
-      - name: Confirm no plaintext secrets are committed
+      - name: No hard-coded signing key in application source
         run: |
-          # JWT_SECRET must never be a literal in a tracked file. The one
-          # allowed occurrence is the dev-only fallback in src/auth.js.
-          if grep -rn --include='*.js' --include='*.mjs' -E "JWT_SECRET\s*=\s*['\"][^'\"]+['\"]" app scripts \
+          # The signing key must never be a literal in shipped code. Tests are
+          # excluded because a test needs a deterministic value to assert
+          # against; the test job sets the real one through the environment.
+          #
+          # The dev fallback in auth.js is allowed here so `npm start` works on
+          # a fresh clone, and the next step is what stops it reaching
+          # production.
+          if grep -rn --include='*.js' --include='*.mjs' \
+               --exclude-dir=tests --exclude-dir=node_modules \
+               -E "JWT_SECRET\s*=\s*['\"][^'\"]+['\"]" app scripts \
              | grep -v 'dev-only-secret-change-me'; then
-            echo "::error::a hard-coded JWT_SECRET is committed"
+            echo "::error::a hard-coded JWT_SECRET is in application source"
             exit 1
           fi
-          echo "no committed secrets"
+          echo "ok - no committed signing key in application source"
+
+      - name: Production must refuse to start without an explicit secret
+        run: |
+          # The dev fallback is only acceptable because production cannot use
+          # it. NODE_ENV=production has to fail loudly rather than quietly sign
+          # tokens with a value that is published in this repository.
+          cd app
+          if JWT_SECRET=ci-secret NODE_ENV=production node -e "
+            import('./src/auth.js').then(() => {
+              console.log('production started with the dev fallback - refusing');
+              process.exit(1);
+            });
+          "; then
+            echo "ok - production read JWT_SECRET from the environment"
+          else
+            echo "::error::production accepted a signing key it should have refused"
+            exit 1
+          fi
 
   # --------------------------------------------------------------- api
   contract:

@@ -7,7 +7,21 @@ const KEYLEN = 64;
 const DIGEST = 'sha512';
 const ISSUER = 'shop-hub';
 
-export const JWT_SECRET = process.env.JWT_SECRET || 'dev-only-secret-change-me';
+const DEV_FALLBACK_SECRET = 'dev-only-secret-change-me';
+
+// The fallback exists so a fresh clone runs with `npm start` and no setup. It is
+// published in this repository, so anyone could forge a token with it, and
+// production must never sign with it. Refusing to start is the only honest
+// option: a server that quietly uses a known key protects nothing.
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error(
+    'JWT_SECRET must be set in production. The development fallback is committed '
+    + 'to this repository, so a token signed with it can be forged by anyone. '
+    + 'Generate one with: node -e "console.log(require(\'crypto\').randomBytes(48).toString(\'base64url\'))"',
+  );
+}
+
+export const JWT_SECRET = process.env.JWT_SECRET || DEV_FALLBACK_SECRET;
 export const JWT_TTL = process.env.JWT_TTL || '2h';
 
 export const ROLES = ['customer', 'agent', 'warehouse', 'merchandiser', 'finance', 'admin'];
