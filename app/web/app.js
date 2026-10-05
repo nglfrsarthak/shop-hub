@@ -29,8 +29,13 @@ const ROUTES = [
   { path: '/users',     screen: 'users',      label: 'Users',        roles: ['admin'] },
 ];
 
+// Hash routes are written "#/orders/6", so the leading slash has to come off
+// before splitting. Left in, "/orders/6".split("/") is ["", "orders", "6"] and
+// the first segment - the one that identifies the screen - is empty, which made
+// every route resolve to "/" and the dashboard render no matter where you went.
 const parseHash = () => {
-  const raw = location.hash.replace(/^#/, '') || '/';
+  const raw = location.hash.replace(/^#/, '').replace(/^\/+/, '');
+  if (!raw) return { path: '/', params: [] };
   const [path, ...rest] = raw.split('/');
   return { path: `/${path}`, params: rest.filter(Boolean) };
 };
@@ -503,13 +508,19 @@ screens.inventory = async () => {
 
 screens.products = async () => {
   const list = await api('/catalog?per=50&sort=newest');
+  // The catalogue read is public, so this screen renders for anyone who reaches
+  // it by typing the hash. Hiding the nav link is not access control - the
+  // Reprice control only appears for the roles allowed to use it. The server
+  // rejects the write regardless; this just avoids offering a button that
+  // cannot work.
+  const canReprice = ['merchandiser', 'admin'].includes(role());
   return `<p class="muted">${list.total} SKU${list.total === 1 ? '' : 's'} live</p>` + table([
     { label: 'Product', render: (v) => `<strong>${esc(v.product_name)}</strong>` },
     { label: 'Brand', render: (v) => esc(v.brand) },
     { label: 'SKU', render: (v) => `<code>${esc(v.sku)}</code>` },
     { label: 'Price', num: true, render: (v) => inr(v.price_paise) },
     { label: 'Available', num: true, render: (v) => v.available },
-    { label: '', render: (v) => `<button class="btn btn-sm" data-reprice="${v.id}" data-price="${v.price_paise}">Reprice</button>` },
+    ...(canReprice ? [{ render: (v) => `<button class="btn btn-sm" data-reprice="${v.id}" data-price="${v.price_paise}">Reprice</button>` }] : []),
   ], list.data);
 };
 
@@ -727,6 +738,18 @@ async function render(quiet = false) {
   const route = ROUTES.find((r) => r.path === path);
   if (!route) {
     app.innerHTML = renderChrome('<p class="empty">No such screen. <a href="#/">Dashboard</a></p>');
+    wireGlobal();
+    return;
+  }
+
+  // A route's roles gate the nav link, not the route itself. Someone who types
+  // the hash, or follows a stale link from another account, must not land on a
+  // screen built for a role they do not hold - so it is checked here as well.
+  if (route.roles && !route.roles.includes(role())) {
+    const allowed = route.roles.join(' or ');
+    app.innerHTML = renderChrome(
+      `<div class="banner banner-error">This screen is for ${allowed} accounts. You are signed in as ${esc(role())}.</div>`,
+    );
     wireGlobal();
     return;
   }
