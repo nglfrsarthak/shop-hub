@@ -1,0 +1,14 @@
+{
+  "name": "shop-hub",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ShopHub - ecommerce operations platform (lab submission, Jira + GitHub only)",
+  "type": "module",
+  "workspaces": ["app"],
+  "scripts": {
+    "test": "npm --workspace app test",
+    "start": "npm --workspace app start",
+    "smoke": "node scripts/smoke-test.mjs",
+    "console-check": "node scripts/console-check.mjs"
+  }
+}
