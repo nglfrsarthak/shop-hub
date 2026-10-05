@@ -1,0 +1,125 @@
+# ShopHub CI
+#
+# GitHub Actions is the only CI for this project. Three jobs, each with one
+# reason to fail, so a red X always tells you what broke.
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+# A superseded run on the same branch is cancelled: the newer commit is the one
+# you actually care about.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # --------------------------------------------------------------- gate
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Unit and acceptance tests
+        run: npm test
+
+      - name: Smoke test against a real server
+        run: |
+          cd app
+          PORT=3000 DB_SEED=true JWT_SECRET=ci-secret npm start &
+          # Wait for the port to answer rather than sleeping a fixed amount.
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3000/readyz >/dev/null 2>&1; then
+              echo "server up after ${i}s"
+              break
+            fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:3000/readyz
+          cd ..
+          node scripts/smoke-test.mjs http://127.0.0.1:3000
+
+      - name: Show the server log if something went wrong
+        if: failure()
+        run: echo "see the smoke test output above for the failing check"
+
+  # --------------------------------------------------------------- static
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Parse every source file
+        # `node --check` on an ES module needs the input-type flag; without it
+        # Node reads the file as CommonJS and top-level await is a syntax error.
+        run: |
+          find app scripts -name '*.js' -o -name '*.mjs' | while read -r f; do
+            node --input-type=module --check < "$f" || echo "PARSE FAIL: $f"
+          done
+      - name: Confirm no plaintext secrets are committed
+        run: |
+          # JWT_SECRET must never be a literal in a tracked file. The one
+          # allowed occurrence is the dev-only fallback in src/auth.js.
+          if grep -rn --include='*.js' --include='*.mjs' -E "JWT_SECRET\s*=\s*['\"][^'\"]+['\"]" app scripts \
+             | grep -v 'dev-only-secret-change-me'; then
+            echo "::error::a hard-coded JWT_SECRET is committed"
+            exit 1
+          fi
+          echo "no committed secrets"
+
+  # --------------------------------------------------------------- api
+  contract:
+    name: API contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci
+      - name: Start the API and check its self-description
+        run: |
+          cd app
+          PORT=3000 DB_SEED=true JWT_SECRET=ci-secret npm start &
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:3000/readyz >/dev/null 2>&1 && break
+            sleep 1
+          done
+          echo "--- /api/v1/meta ---"
+          curl -fsS http://127.0.0.1:3000/api/v1/meta | tee /tmp/meta.json
+          echo
+          echo "--- assertions ---"
+          node -e "
+            const m = require('/tmp/meta.json');
+            const checks = [
+              ['service is shop-hub', m.service === 'shop-hub'],
+              ['money is integer paise', m.money_unit === 'paise (integer)'],
+              ['at least 50 endpoints', m.endpoints >= 50],
+              ['at least 18 tables', m.tables >= 18],
+              ['six roles', m.roles.length === 6],
+            ];
+            let bad = 0;
+            for (const [name, ok] of checks) {
+              console.log((ok ? 'ok  ' : 'FAIL') + ' - ' + name);
+              if (!ok) bad++;
+            }
+            process.exit(bad ? 1 : 0);
+          "
