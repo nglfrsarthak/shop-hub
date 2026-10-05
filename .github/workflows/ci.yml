@@ -67,6 +67,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+          cache: npm
+      # auth.js imports jsonwebtoken, and the production guard below imports
+      # auth.js. Without the install, that step fails on a missing package
+      # instead of on the guard, and a check that passes for the wrong reason
+      # is worse than no check at all.
+      - run: npm ci
       - name: Parse every source file
         # `node --check` on an ES module needs the input-type flag; without it
         # Node reads the file as CommonJS and top-level await is a syntax error.
@@ -94,19 +100,44 @@ jobs:
 
       - name: Production must refuse to start without an explicit secret
         run: |
-          # The dev fallback is only acceptable because production cannot use
-          # it. NODE_ENV=production has to fail loudly rather than quietly sign
-          # tokens with a value that is published in this repository.
+          # The dev fallback is only acceptable because production cannot reach
+          # it. This asserts both halves of that, because a guard that always
+          # throws would also pass a test that only checked for throwing.
           cd app
-          if JWT_SECRET=ci-secret NODE_ENV=production node -e "
-            import('./src/auth.js').then(() => {
-              console.log('production started with the dev fallback - refusing');
-              process.exit(1);
-            });
+
+          echo "--- production with no JWT_SECRET: must refuse ---"
+          if NODE_ENV=production JWT_SECRET= node -e "
+            import('./src/auth.js').then(
+              () => { console.log('STARTED'); process.exit(0); },
+              () => process.exit(3),
+            );
           "; then
-            echo "ok - production read JWT_SECRET from the environment"
+            echo "::error::production started with the published dev fallback"
+            exit 1
           else
-            echo "::error::production accepted a signing key it should have refused"
+            echo "ok - refused"
+          fi
+
+          echo "--- production with JWT_SECRET set: must load ---"
+          if NODE_ENV=production JWT_SECRET=ci-secret node -e "
+            import('./src/auth.js').then(
+              () => { console.log('loaded'); process.exit(0); },
+              (e) => { console.log(e.message); process.exit(1); },
+            );
+          "; then
+            echo "ok - read the key from the environment"
+          else
+            echo "::error::production refused a key it was given"
+            exit 1
+          fi
+
+          echo "--- development with no JWT_SECRET: must still start ---"
+          if node -e "
+            import('./src/auth.js').then(() => process.exit(0), () => process.exit(1));
+          "; then
+            echo "ok - a fresh clone still runs"
+          else
+            echo "::error::development refused to start without a key"
             exit 1
           fi
 
