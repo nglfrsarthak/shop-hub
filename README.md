@@ -5,7 +5,9 @@ inventory, cart, orders, payments, returns, refunds, fulfilment and reporting,
 with role-based access, integer money and closed state machines.
 
 Built as a lab submission. The toolchain is deliberately two tools: **Jira** for
-the work, **GitHub** for the code.
+the work, **GitHub** for the code. The `Dockerfile` below is local run
+convenience only - it is not part of the pipeline, and CI neither builds nor
+publishes an image.
 
 ---
 
@@ -44,6 +46,48 @@ Password for all of them: `Passw0rd!`
 
 Only `customer` can be self-registered. Staff roles exist because an admin
 provisions them - which is the point of the access-control stories.
+
+---
+
+## Running in Docker
+
+```bash
+docker build -t shophub .
+
+docker run --rm -p 3020:3000 \
+  -e JWT_SECRET="$(node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))")" \
+  -e DB_SEED=true \
+  -v shop-data:/data \
+  shophub
+```
+
+Open <http://127.0.0.1:3020>. `DB_SEED=true` is only needed on the first boot;
+leave it off afterwards so restarting does not replay the demo data.
+
+Four things worth knowing about the image:
+
+**It refuses to start without a secret.** `NODE_ENV=production` is set in the
+image, so the guard in `auth.js` fires and the container exits rather than
+signing tokens with the dev fallback that is committed to this repository. That
+is the intended behaviour, but it does mean the `-e JWT_SECRET=...` above is
+not optional.
+
+**The database lives in a volume.** `/data/shop.db`, not the container layer,
+so removing the container does not remove the data. Drop the volume to start
+clean. The bind-mount alternative would put a Linux file inside a Windows
+checkout, which is the wrong trade for this app.
+
+**It runs as `node`, uid 1000**, never root.
+
+**Nothing is compiled.** `better-sqlite3` ships a prebuilt `linux-x64` binary,
+and `npm ci --ignore-scripts` is what lets it be used as shipped - the package
+has a `binding.gyp`, which makes npm run `node-gyp rebuild` even though the
+package defines no install script. The build then loads that prebuild in the
+build stage, so a binary that would not load fails the build instead of failing
+the first database request.
+
+The image is ~376 MB, which is most of it being `node:24-slim`. The application
+and its dependencies are a few megabytes.
 
 ---
 
@@ -111,8 +155,9 @@ app/
   tests/api.test.js         74 acceptance tests
   web/                      the console: index.html, app.js, styles.css
 scripts/
-  smoke-test.mjs            26 checks against a running server
+  smoke-test.mjs            30 checks against a running server
 docs/                       the lab submission
+Dockerfile                  local run only; CI does not build it
 ```
 
 18 tables, 50 HTTP endpoints, 6 roles.
@@ -134,7 +179,7 @@ show access control working.
 
 ```bash
 cd app && npm test                    # 74 acceptance tests, no server needed
-node scripts/smoke-test.mjs            # 26 checks against a running server
+node scripts/smoke-test.mjs            # 30 checks against a running server
 ```
 
 `node --test` and `supertest`, no test framework and no runner config.

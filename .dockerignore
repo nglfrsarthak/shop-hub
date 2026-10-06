@@ -1,0 +1,33 @@
+# Everything the build does not copy anyway, plus the things that make the
+# build context needlessly large. The Dockerfile only COPYs package.json,
+# package-lock.json, app/package.json, app/server.js, app/src and app/web.
+
+.git
+.gitignore
+
+# Installed on the host and on a different platform than the target, so
+# shipping them would both bloat the context and shadow the npm ci result.
+node_modules
+**/node_modules
+
+# Screenshots and their text dumps are ~4 MB of PNGs; nothing in the image
+# reads them.
+docs
+
+# The browser automation drivers need Edge and a signed-in session; they are
+# development tooling, not part of the application.
+scripts
+*.log
+
+# Seeded host database. The container gets its own at /data.
+data
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Jira capture profiles hold cookies and a signed-in session.
+.shot-profile*
+.shot-diag*
+*.out.log
+*.err.log

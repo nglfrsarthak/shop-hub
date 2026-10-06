@@ -15,6 +15,11 @@ import fulfilmentRoutes from './src/routes/fulfilment.js';
 import insightRoutes from './src/routes/insights.js';
 
 const PORT = Number(process.env.PORT || 3000);
+// 127.0.0.1 is right on the host: the console and API are same-origin and
+// nothing else should reach them. Inside a container loopback is unreachable
+// from outside, so HOST=0.0.0.0 is passed there. Unset on a dev machine the
+// default stays as it always was.
+const HOST = process.env.HOST || '127.0.0.1';
 const startedAt = Date.now();
 
 migrate();
@@ -108,8 +113,8 @@ app.use((err, _req, res, _next) => {
 });
 
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, '127.0.0.1', () => {
-    console.log(`ShopHub listening on http://127.0.0.1:${PORT}`);
+  app.listen(PORT, HOST, () => {
+    console.log(`ShopHub listening on http://${HOST === '0.0.0.0' ? '127.0.0.1' : HOST}:${PORT}`);
     console.log(`  console  http://127.0.0.1:${PORT}/`);
     console.log(`  api      http://127.0.0.1:${PORT}/api/v1/meta`);
     if (seedResult.seeded) console.log(`  demo     password for every account: ${DEMO_PASSWORD}`);
