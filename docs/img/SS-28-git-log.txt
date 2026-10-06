@@ -1,0 +1,16 @@
+deb5d0e fix: align the lifecycle and payment rules with the Jira acceptance criteria
+6d7abe2 chore: ignore the browser automation profiles
+96f6a1d build: container image for local run
+f4e4963 fix(web): every console route rendered the dashboard
+db38c61 feat(docs): capture real command output as screenshots
+ac7e2f1 ci: make the production guard check test what it claims to
+805452e fix(security): refuse the dev signing-key fallback in production
+4c50b4e ci: add the GitHub Actions workflow
+30b1429 ci: GitHub Actions, smoke test, console contract check and README
+b959173 feat(web): vanilla-JS console served from the API origin
+77ba79d test: 74 acceptance tests against a seeded database
+f63fada feat: entrypoint, health checks and demo data
+c22c628 feat(E6,E7): dispatch, tracking events and reporting
+2e37652 feat(E5): idempotent payments, returns and reconciliation
+20e942d feat(E4): cart, checkout and a closed order state machine
+45c3d7b feat(E3): stock levels, movements and the no-oversell rule

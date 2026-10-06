@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>SS-26-console-check</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; background:#0d1117; font:13px/1.55 ui-monospace, "Cascadia Mono", Consolas, monospace; }
+  .frame { padding:18px 20px 22px; }
+  .bar { display:flex; align-items:center; gap:8px; padding-bottom:12px; border-bottom:1px solid #21262d; margin-bottom:14px; }
+  .dot { width:11px; height:11px; border-radius:50%; }
+  .title { margin-left:10px; color:#e6edf3; font-size:13px; font-weight:600; }
+  .cmd { margin-left:auto; color:#8b949e; font-size:12px; }
+  pre { margin:0; color:#c9d1d9; white-space:pre-wrap; word-break:break-word; }
+  .hl  { color:#ffa657; font-weight:600; }
+  .ok  { color:#3fb950; }
+  .bad { color:#f85149; }
+  .cmt { color:#58a6ff; }
+  .dim { color:#6e7681; }
+</style></head>
+<body><div class="frame">
+  <div class="bar">
+    <span class="dot" style="background:#ff5f57"></span>
+    <span class="dot" style="background:#febc2e"></span>
+    <span class="dot" style="background:#28c840"></span>
+    <span class="title">node scripts/console-check.mjs - the browser client's formatter and error mapper</span>
+    <span class="cmd">node C:\Users\sarth\shop-hub\scripts\console-check.mjs</span>
+  </div>
+  <pre>formatting
+  OK   inr formats paise
+  OK   inr groups thousands
+  OK   inr pads a single paise
+  OK   inr of zero
+  OK   inr of null
+  OK   inr of one rupee
+  OK   inr negative
+  OK   inr has no float drift
+  OK   titleCase
+  OK   shortDate handles junk
+  OK   shortDate handles null
+  OK   relative handles junk
+error messages
+  OK   401 -&gt; sign in again
+  OK   403 names the roles needed
+  OK   insufficient_stock names the SKU
+  OK   illegal transition lists legal states
+  OK   terminal state says so
+  OK   unknown endpoint
+  OK   payment declined
+  OK   self-assign role refusal
+  OK   self-assign names what is allowed
+  OK   a specific 403 beats the generic one
+  OK   underscores become spaces
+  OK   bare 403 has no roles
+live calls
+  OK   starts signed out
+  OK   signs in as a customer
+  OK   dashboard returns role cards
+  OK   dashboard reports its role
+  OK   catalogue page loads
+  OK   catalogue rows name their product
+  OK   catalogue rows show a display price
+  OK   product page loads
+  OK   variants agree with in_stock
+  OK   cart is reachable
+  OK   cart total is internally consistent
+  OK   orders list loads
+  OK   customer is refused the inventory route
+  OK   the refusal explains itself
+  OK   reconciliation identity holds
+  OK   reconciliation never goes negative
+  OK   payment ledger loads
+  OK   best sellers load
+  OK   audit ledger loads as admin
+  OK   inventory loads as warehouse
+  OK   inventory summary is present
+  OK   low-stock report loads
+  OK   signs out
+  OK   idempotency key is long enough
+  OK   idempotency keys differ per call
+
+CONSOLE CONTRACT: ALL OK
+</pre>
+</div></body></html>

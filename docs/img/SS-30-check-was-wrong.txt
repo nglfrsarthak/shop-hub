@@ -1,0 +1,5 @@
+throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'jsonwebtoken' imported from /home/runner/work/shop-hub/shop-hub/app/src/auth.js
+code: 'ERR_MODULE_NOT_FOUND'
+##[error]production accepted a signing key it should have refused
+##[error]Process completed with exit code 1.

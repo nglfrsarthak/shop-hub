@@ -1,0 +1,162 @@
+DIALOG
+Sprint 1 - catalogue and stock
+Customers can browse, order and pay for stock that is actually there.
+13 days left
+Start date
+Oct 5, 2026
+End date
+Oct 19, 2026
+PAGE
+Skip to:
+Top Bar
+Sidebar
+Main Content
+Space navigation
+Collapse sidebar
+Switch sites or apps
+Jira
+Create
+See plans
+1 Notification
+1
+Help
+Settings
+sarthakpagare005@gmail.com
+For you
+Recent
+Starred
+Apps
+More actions for Apps
+Plans
+Create plan
+More actions for Plans
+Spaces
+Create space
+More actions for spaces
+Recent
+Shop Hub
+More actions for Shop Hub
+More spaces
+Recommended
+Collect IT requests
+Try
+Filters
+Dashboards
+Create dashboard
+Assets
+, (opens new window)
+Teams
+, (opens new window)
+Teams
+Goals
+, (opens new window)
+Projects
+, (opens new window)
+Customize sidebar
+Resize panel
+Spaces
+Shop Hub
+Give feedback
+Enter full screen
+Summary
+More actions
+Backlog
+More actions
+Board
+More actions
+Development
+More actions
+Timeline
+More actions
+Docs
+More actions
+Forms
+More actions
+Filter by assignee
+Filter
+Group
+Complete sprint
+Sprint details
+Sprint insights
+View settings
+More board view actions
+To Do
+0
+Collapse To Do
+More actions for column To Do
+In Progress
+0
+Collapse In Progress
+More actions for column In Progress
+In Review
+0
+Collapse In Review
+More actions for column In Review
+Done
+26
+Collapse Done
+More actions for column Done
+As a visitor, I want to create my own account so I can place orders
+Edit summary for SCRUM-21 As a visitor, I want to create my own account so I can place orders
+Card actions on Story SCRUM-21 of the Done column
+e1
+E1 — Accounts, roles and access control
+SCRUM-21
+–
+As a registered user, I want to sign in and stay signed in for two hours
+Edit summary for SCRUM-22 As a registered user, I want to sign in and stay signed in for two hours
+Card actions on Story SCRUM-22 of the Done column
+e1
+E1 — Accounts, roles and access control
+SCRUM-22
+–
+As an administrator, I want to provision staff accounts so my team can start working
+Edit summary for SCRUM-23 As an administrator, I want to provision staff accounts so my team can start working
+Card actions on Story SCRUM-23 of the Done column
+e1
+E1 — Accounts, roles and access control
+SCRUM-23
+–
+As a user, I want my addresses saved so checkout is quick
+Edit summary for SCRUM-24 As a user, I want my addresses saved so checkout is quick
+Card actions on Story SCRUM-24 of the Done column
+e1
+E1 — Accounts, roles and access control
+SCRUM-24
+–
+As a shopper, I want to browse products by category so I can find things
+Edit summary for SCRUM-25 As a shopper, I want to browse products by category so I can find things
+Card actions on Story SCRUM-25 of the Done column
+e2
+E2 — Catalogue and pricing
+SCRUM-25
+–
+As a shopper, I want to search so I can find a specific item
+Edit summary for SCRUM-26 As a shopper, I want to search so I can find a specific item
+Card actions on Story SCRUM-26 of the Done column
+e2
+E2 — Catalogue and pricing
+SCRUM-26
+–
+As a merchandiser, I want to change prices so I can run promotions
+Edit summary for SCRUM-27 As a merchandiser, I want to change prices so I can run promotions
+Card actions on Story SCRUM-27 of the Done column
+e2
+E2 — Catalogue and pricing
+SCRUM-27
+–
+As a shopper, I want to see availability on the product page
+Edit summary for SCRUM-28 As a shopper, I want to see availability on the product page
+Card actions on Story SCRUM-28 of the Done column
+e2
+E2 — Catalogue and pricing
+SCRUM-28
+–
+ 
+Sprint 1 - catalogue and stock
+Customers can browse, order and pay for stock that is actually there.
+13 days left
+Start date
+Oct 5, 2026
+End date
+Oct 19, 2026

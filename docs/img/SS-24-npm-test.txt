@@ -1,0 +1,17 @@
+ok 1 - E1 - identity, access and roles
+ok 2 - E2 - catalogue and pricing
+ok 3 - E3 - inventory and the no-oversell rule
+ok 4 - E4 - cart and orders
+ok 5 - E5 - payments, returns and refunds
+ok 6 - E6 - fulfilment
+ok 7 - E7 - reporting and audit
+ok 8 - cross-cutting invariants
+
+# ---- summary ----
+# tests 78
+# suites 8
+# pass 78
+# fail 0
+# cancelled 0
+# skipped 0
+# duration_ms 3227.7315

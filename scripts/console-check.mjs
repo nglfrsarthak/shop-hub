@@ -1,7 +1,7 @@
 // throwaway: exercise the console's API client the way the browser will
 import { api, ApiError, inr, shortDate, relative, titleCase, ApiError as E } from '../app/web/api.js';
 
-const BASE = 'http://127.0.0.1:3210';
+const BASE = process.env.APP_URL ?? 'http://127.0.0.1:3210';
 const fail = [];
 const ok = (name, cond, extra = '') => {
   if (cond) console.log('  OK   ' + name);

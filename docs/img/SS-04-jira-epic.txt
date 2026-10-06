@@ -1,0 +1,165 @@
+Skip to:
+Top Bar
+Sidebar
+Main Content
+Collapse sidebar
+Switch sites or apps
+Jira
+Create
+See plans
+1 Notification
+1
+Help
+Settings
+sarthakpagare005@gmail.com
+For you
+Recent
+Starred
+Apps
+More actions for Apps
+Plans
+Create plan
+More actions for Plans
+Spaces
+Create space
+More actions for spaces
+Recent
+Shop Hub
+More actions for Shop Hub
+More spaces
+Recommended
+Collect IT requests
+Try
+Filters
+Dashboards
+Create dashboard
+Assets
+, (opens new window)
+Teams
+, (opens new window)
+Teams
+Goals
+, (opens new window)
+Projects
+, (opens new window)
+Customize sidebar
+Resize panel
+Spaces
+Shop Hub
+SCRUM-16
+E3 — Stock levels and the no-oversell rule
+Add or create work related to this Epic
+Add apps
+Summarize work item
+Collapse Description
+Description
+4 stories. Acceptance criteria on each story are assertions the 74-test suite actually makes.
+Collapse Child work items
+Child work items
+Work item actions
+Configure columns
+Create child
+100% Done
+Work
+More actions for Work
+	
+Priority
+More actions for Priority
+	
+Assignee
+More actions for Assignee
+	
+Status
+Status • Sort in ascending order
+More actions for Status
+SCRUM-29
+Copy link
+As a shopper, I want to be able to buy the last unit so the order is real
+	
+Medium
+	
+Unassigned
+	
+Done
+SCRUM-30
+Copy link
+As a warehouse operator, I want reserved stock released when an order is cancelled
+	
+Medium
+	
+Unassigned
+	
+Done
+SCRUM-31
+Copy link
+As a warehouse operator, I want to adjust stock so the ledger explains the shelf
+	
+Medium
+	
+Unassigned
+	
+Done
+SCRUM-32
+Copy link
+As a warehouse operator, I want to know what is running low
+	
+Medium
+	
+Unassigned
+	
+Done
+Linked work items
+Add linked work item
+Confluence content
+Details about Confluence templates.
+More
+Project plan
+Try template
+Activity
+All
+Comments
+History
+Work log
+Newest first
+Add a comment…
+Who is working on this...?
+Status update...
+Thanks...
+Pro tip: press 
+M
+ to comment
+Resize work item view side panel
+1
+Share
+Actions
+To Do
+Automation
+Improve Epic
+Details
+Assignee
+Unassigned
+Assign to me
+Labels
+e3
+Parent
+Add parent
+Team
+Add team
+Due date
+Add due date
+Start date
+Add date
+Sprint
+Add sprint
+Story point estimate
+Add story points
+Reporter
+Sarthak Pagare
+Development
+Automation
+Rule executions
+Atlassian project
+Link to share status and updates
+Created 1 day ago
+Updated 1 day ago
+Configure

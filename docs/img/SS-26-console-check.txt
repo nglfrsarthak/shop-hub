@@ -1,0 +1,54 @@
+formatting
+  OK   inr formats paise
+  OK   inr groups thousands
+  OK   inr pads a single paise
+  OK   inr of zero
+  OK   inr of null
+  OK   inr of one rupee
+  OK   inr negative
+  OK   inr has no float drift
+  OK   titleCase
+  OK   shortDate handles junk
+  OK   shortDate handles null
+  OK   relative handles junk
+error messages
+  OK   401 -> sign in again
+  OK   403 names the roles needed
+  OK   insufficient_stock names the SKU
+  OK   illegal transition lists legal states
+  OK   terminal state says so
+  OK   unknown endpoint
+  OK   payment declined
+  OK   self-assign role refusal
+  OK   self-assign names what is allowed
+  OK   a specific 403 beats the generic one
+  OK   underscores become spaces
+  OK   bare 403 has no roles
+live calls
+  OK   starts signed out
+  OK   signs in as a customer
+  OK   dashboard returns role cards
+  OK   dashboard reports its role
+  OK   catalogue page loads
+  OK   catalogue rows name their product
+  OK   catalogue rows show a display price
+  OK   product page loads
+  OK   variants agree with in_stock
+  OK   cart is reachable
+  OK   cart total is internally consistent
+  OK   orders list loads
+  OK   customer is refused the inventory route
+  OK   the refusal explains itself
+  OK   reconciliation identity holds
+  OK   reconciliation never goes negative
+  OK   payment ledger loads
+  OK   best sellers load
+  OK   audit ledger loads as admin
+  OK   inventory loads as warehouse
+  OK   inventory summary is present
+  OK   low-stock report loads
+  OK   signs out
+  OK   idempotency key is long enough
+  OK   idempotency keys differ per call
+
+CONSOLE CONTRACT: ALL OK

@@ -1,0 +1,42 @@
+[
+  {
+    "name": "SS-24-npm-test",
+    "file": "C:\\Users\\sarth\\shop-hub\\docs\\img\\SS-24-npm-test.html",
+    "caption": "npm test - 78 acceptance tests across 8 suites, all passing"
+  },
+  {
+    "name": "SS-26-console-check",
+    "file": "C:\\Users\\sarth\\shop-hub\\docs\\img\\SS-26-console-check.html",
+    "caption": "node scripts/console-check.mjs - the browser client's formatter and error mapper"
+  },
+  {
+    "name": "SS-27-ci-run",
+    "file": "C:\\Users\\sarth\\shop-hub\\docs\\img\\SS-27-ci-run.html",
+    "caption": "gh run view - the CI pipeline for the pushed commit"
+  },
+  {
+    "name": "SS-28-git-log",
+    "file": "C:\\Users\\sarth\\shop-hub\\docs\\img\\SS-28-git-log.html",
+    "caption": "git log --oneline - one epic or fix per commit"
+  },
+  {
+    "name": "SS-29-ci-first-failure",
+    "file": "C:\\Users\\sarth\\shop-hub\\docs\\img\\SS-29-ci-first-failure.html",
+    "caption": "Run 37274485133 - Lint fails on a hard-coded JWT_SECRET"
+  },
+  {
+    "name": "SS-30-check-was-wrong",
+    "file": "C:\\Users\\sarth\\shop-hub\\docs\\img\\SS-30-check-was-wrong.html",
+    "caption": "Run 37274799850 - the replacement check failed for its own reason"
+  },
+  {
+    "name": "SS-31-smoke-test",
+    "file": "C:\\Users\\sarth\\shop-hub\\docs\\img\\SS-31-smoke-test.html",
+    "caption": "node scripts/smoke-test.mjs - 30 checks over HTTP against the running server"
+  },
+  {
+    "name": "SS-25-api-meta",
+    "file": "C:\\Users\\sarth\\shop-hub\\docs\\img\\SS-25-api-meta.html",
+    "caption": "GET /api/v1/meta - the API describing its own endpoint and table counts"
+  }
+]

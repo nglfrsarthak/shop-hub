@@ -1,0 +1,3 @@
+completed	success	fix: align the lifecycle and payment rules with the Jira acceptance c…	CI	main	push	37454097365	31s	2026-10-06T11:05:28Z
+completed	success	chore: ignore the browser automation profiles	CI	main	push	37437409429	27s	2026-10-06T08:38:00Z
+completed	success	build: container image for local run	CI	main	push	37437266968	28s	2026-10-06T08:36:41Z

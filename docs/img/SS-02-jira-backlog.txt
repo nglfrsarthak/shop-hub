@@ -1,0 +1,189 @@
+Skip to:
+Top Bar
+Main Content
+Collapse sidebar
+Switch sites or apps
+Jira
+Create
+1 Notification
+1
+Help
+Settings
+sarthakpagare005@gmail.com
+For you
+Recent
+Starred
+Apps
+More actions for Apps
+Plans
+Create plan
+More actions for Plans
+Spaces
+Create space
+More actions for spaces
+Recent
+Shop Hub
+More actions for Shop Hub
+More spaces
+Recommended
+Collect IT requests
+Try
+Filters
+Dashboards
+Create dashboard
+Assets
+, (opens new window)
+Teams
+, (opens new window)
+Teams
+Goals
+, (opens new window)
+Projects
+, (opens new window)
+Customize sidebar
+Resize panel
+Spaces
+Shop Hub
+Give feedback
+Enter full screen
+Summary
+More actions
+Backlog
+More actions
+Board
+More actions
+Development
+More actions
+Timeline
+More actions
+Docs
+More actions
+Forms
+More actions
+Filter by assignee
+Filter
+Backlog insights
+View settings
+More actions
+Collapse
+Sprint 1 - catalogue and stock
+5 Oct – 19 Oct (26 work items)
+Sprint 1 - catalogue and stock 26 work items
+0
+To Do: 0 of 0 (story points)
+0
+In Progress: 0 of 0 (story points)
+0
+Done: 0 of 0 (story points)
+Complete sprint
+Sprint 1 - catalogue and stock actions
+Customers can browse, order and pay for stock that is actually there.
+Create
+SCRUM-21
+As a visitor, I want to create my own account so I can place orders
+SCRUM-21
+As a visitor, I want to create my own account so I can place orders
+E1 — Accounts, roles and access control
+status
+Done
+-
+SCRUM-22
+As a registered user, I want to sign in and stay signed in for two hours
+SCRUM-22
+As a registered user, I want to sign in and stay signed in for two hours
+E1 — Accounts, roles and access control
+status
+Done
+-
+SCRUM-23
+As an administrator, I want to provision staff accounts so my team can start working
+SCRUM-23
+As an administrator, I want to provision staff accounts so my team can start working
+E1 — Accounts, roles and access control
+status
+Done
+-
+SCRUM-24
+As a user, I want my addresses saved so checkout is quick
+SCRUM-24
+As a user, I want my addresses saved so checkout is quick
+E1 — Accounts, roles and access control
+status
+Done
+-
+SCRUM-25
+As a shopper, I want to browse products by category so I can find things
+SCRUM-25
+As a shopper, I want to browse products by category so I can find things
+E2 — Catalogue and pricing
+status
+Done
+-
+SCRUM-26
+As a shopper, I want to search so I can find a specific item
+SCRUM-26
+As a shopper, I want to search so I can find a specific item
+E2 — Catalogue and pricing
+status
+Done
+-
+SCRUM-27
+As a merchandiser, I want to change prices so I can run promotions
+SCRUM-27
+As a merchandiser, I want to change prices so I can run promotions
+E2 — Catalogue and pricing
+status
+Done
+-
+SCRUM-28
+As a shopper, I want to see availability on the product page
+SCRUM-28
+As a shopper, I want to see availability on the product page
+E2 — Catalogue and pricing
+status
+Done
+-
+SCRUM-29
+As a shopper, I want to be able to buy the last unit so the order is real
+SCRUM-29
+As a shopper, I want to be able to buy the last unit so the order is real
+E3 — Stock levels and the no-oversell rule
+status
+Done
+-
+SCRUM-30
+As a warehouse operator, I want reserved stock released when an order is cancelled
+SCRUM-30
+As a warehouse operator, I want reserved stock released when an order is cancelled
+E3 — Stock levels and the no-oversell rule
+status
+Done
+-
+SCRUM-31
+As a warehouse operator, I want to adjust stock so the ledger explains the shelf
+SCRUM-31
+As a warehouse operator, I want to adjust stock so the ledger explains the shelf
+E3 — Stock levels and the no-oversell rule
+status
+Done
+-
+SCRUM-32
+As a warehouse operator, I want to know what is running low
+SCRUM-32
+As a warehouse operator, I want to know what is running low
+E3 — Stock levels and the no-oversell rule
+status
+Done
+-
+SCRUM-33
+As a shopper, I want to add items to a cart so I can order later
+SCRUM-33
+As a shopper, I want to add items to a cart so I can order later
+E4 — Cart, checkout and order lifecycle
+status
+Done
+-
+SCRUM-34
+As a shopper, I want to see the real total before paying
+SCRUM-34
+As a shopper, I want to see the real total before payi

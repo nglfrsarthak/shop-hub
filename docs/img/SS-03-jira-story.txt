@@ -1,0 +1,119 @@
+Skip to:
+Top Bar
+Main Content
+Collapse sidebar
+Switch sites or apps
+Jira
+Create
+See plans
+1 Notification
+1
+Help
+Settings
+sarthakpagare005@gmail.com
+For you
+Recent
+Starred
+Apps
+More actions for Apps
+Plans
+Create plan
+More actions for Plans
+Spaces
+Create space
+More actions for spaces
+Recent
+Shop Hub
+More actions for Shop Hub
+More spaces
+Recommended
+Collect IT requests
+Try
+Filters
+Dashboards
+Create dashboard
+Assets
+, (opens new window)
+Teams
+, (opens new window)
+Teams
+Goals
+, (opens new window)
+Projects
+, (opens new window)
+Customize sidebar
+Resize panel
+Spaces
+Shop Hub
+SCRUM-16
+SCRUM-29
+As a shopper, I want to be able to buy the last unit so the order is real
+Add or create work related to this Story
+Add apps
+Summarize work item
+Collapse Description
+Description
+Acceptance criteria
+Two concurrent orders for the last unit produce exactly one success and one 409 naming the SKU.
+The availability check and the reservation happen in the same SQL statement, not two separate round trips.
+A successful reservation increases reserved without changing on_hand.
+Subtasks
+Add subtask
+Linked work items
+Add linked work item
+Confluence content
+Details about Confluence templates.
+More
+Product requirements
+Try template
+Activity
+All
+Comments
+History
+Work log
+Newest first
+Add a comment…
+Who is working on this...?
+Status update...
+Thanks...
+Pro tip: press 
+M
+ to comment
+Resize work item view side panel
+1
+Share
+Actions
+Done
+Done
+Automation
+Improve Story
+Details
+Assignee
+Unassigned
+Assign to me
+Priority
+Medium
+Parent
+SCRUM-16 E3 — Stock levels and the no-oversell rule
+Due date
+Add due date
+Labels
+concurrency
+e3
+Team
+Add team
+Start date
+Add date
+Sprint
+Sprint 1 - catalogue and stock
+Story point estimate
+Add story points
+Reporter
+Sarthak Pagare
+Development
+Automation
+Rule executions
+Created 1 day ago
+Updated 1 day ago
+Resolved 1 day ago
+Configure

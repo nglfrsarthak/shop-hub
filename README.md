@@ -152,7 +152,7 @@ app/
       payments.js           E5 payments, returns, refunds, reconciliation
       fulfilment.js         E6 dispatch, tracking events
       insights.js           E7 dashboards, revenue, audit ledger
-  tests/api.test.js         74 acceptance tests
+  tests/api.test.js         78 acceptance tests
   web/                      the console: index.html, app.js, styles.css
 scripts/
   smoke-test.mjs            30 checks against a running server
@@ -160,7 +160,7 @@ docs/                       the lab submission
 Dockerfile                  local run only; CI does not build it
 ```
 
-18 tables, 50 HTTP endpoints, 6 roles.
+18 tables, 51 HTTP endpoints, 6 roles.
 
 ### Why the console has no build step
 
@@ -178,7 +178,7 @@ show access control working.
 ## Running the checks
 
 ```bash
-cd app && npm test                    # 74 acceptance tests, no server needed
+cd app && npm test                    # 78 acceptance tests, no server needed
 node scripts/smoke-test.mjs            # 30 checks against a running server
 ```
 

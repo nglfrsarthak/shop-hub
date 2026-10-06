@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>SS-31-smoke-test</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; background:#0d1117; font:13px/1.55 ui-monospace, "Cascadia Mono", Consolas, monospace; }
+  .frame { padding:18px 20px 22px; }
+  .bar { display:flex; align-items:center; gap:8px; padding-bottom:12px; border-bottom:1px solid #21262d; margin-bottom:14px; }
+  .dot { width:11px; height:11px; border-radius:50%; }
+  .title { margin-left:10px; color:#e6edf3; font-size:13px; font-weight:600; }
+  .cmd { margin-left:auto; color:#8b949e; font-size:12px; }
+  pre { margin:0; color:#c9d1d9; white-space:pre-wrap; word-break:break-word; }
+  .hl  { color:#ffa657; font-weight:600; }
+  .ok  { color:#3fb950; }
+  .bad { color:#f85149; }
+  .cmt { color:#58a6ff; }
+  .dim { color:#6e7681; }
+</style></head>
+<body><div class="frame">
+  <div class="bar">
+    <span class="dot" style="background:#ff5f57"></span>
+    <span class="dot" style="background:#febc2e"></span>
+    <span class="dot" style="background:#28c840"></span>
+    <span class="title">node scripts/smoke-test.mjs - 30 checks over HTTP against the running server</span>
+    <span class="cmd">node C:\Users\sarth\shop-hub\scripts\smoke-test.mjs http://127.0.0.1:3010</span>
+  </div>
+  <pre>
+ShopHub smoke test against http://127.0.0.1:3010
+
+service
+<span class="ok">  PASS  healthz reports ok</span>
+<span class="ok">  PASS  readyz reports the database is reachable</span>
+<span class="ok">  PASS  meta publishes the endpoint count</span>
+
+catalogue
+<span class="ok">  PASS  an anonymous visitor can browse and search</span>
+<span class="ok">  PASS  a product page lists its SKUs with availability</span>
+
+journey 1 - browse, order, pay
+<span class="ok">  PASS  add a SKU to the cart</span>
+<span class="ok">  PASS  the cart total is internally consistent</span>
+<span class="ok">  PASS  checkout creates the order and reserves the stock</span>
+<span class="ok">  PASS  paying captures the money and advances the order</span>
+<span class="ok">  PASS  replaying the same idempotency key does not charge twice</span>
+<span class="ok">  PASS  an order cannot jump straight to shipped</span>
+<span class="ok">  PASS  the warehouse picks and packs it</span>
+<span class="ok">  PASS  dispatch commits the stock and creates the tracking record</span>
+<span class="ok">  PASS  the courier delivers and the order closes</span>
+
+journey 2 - cancel before dispatch
+<span class="ok">  PASS  a second order can be cancelled before it ships</span>
+<span class="ok">  PASS  the cancelled order has released its reservation</span>
+<span class="ok">  PASS  a finished order cannot be cancelled again</span>
+
+journey 3 - return and refund
+<span class="ok">  PASS  a delivered line can be returned</span>
+<span class="ok">  PASS  support approves, the warehouse receives, finance refunds</span>
+<span class="ok">  PASS  finance reconciliation still balances</span>
+
+access control
+<span class="ok">  PASS  a customer cannot reach the inventory report</span>
+<span class="ok">  PASS  the warehouse can receive stock and it lands in the ledger</span>
+<span class="ok">  PASS  the oversell guard refuses more than is available</span>
+<span class="ok">  PASS  a customer cannot provision a staff account</span>
+<span class="ok">  PASS  a customer cannot read the audit ledger</span>
+<span class="ok">  PASS  an unauthenticated call is refused</span>
+<span class="ok">  PASS  an unknown endpoint answers with JSON</span>
+
+console
+<span class="ok">  PASS  the web console is served</span>
+<span class="ok">  PASS  the console stylesheet is served</span>
+
+audit
+<span class="ok">  PASS  the journey is traceable in the audit ledger</span>
+
+------------------------------------------------------------
+30 passed, 0 failed
+------------------------------------------------------------
+
+</pre>
+</div></body></html>

@@ -1,0 +1,53 @@
+
+ShopHub smoke test against http://127.0.0.1:3010
+
+service
+  PASS  healthz reports ok
+  PASS  readyz reports the database is reachable
+  PASS  meta publishes the endpoint count
+
+catalogue
+  PASS  an anonymous visitor can browse and search
+  PASS  a product page lists its SKUs with availability
+
+journey 1 - browse, order, pay
+  PASS  add a SKU to the cart
+  PASS  the cart total is internally consistent
+  PASS  checkout creates the order and reserves the stock
+  PASS  paying captures the money and advances the order
+  PASS  replaying the same idempotency key does not charge twice
+  PASS  an order cannot jump straight to shipped
+  PASS  the warehouse picks and packs it
+  PASS  dispatch commits the stock and creates the tracking record
+  PASS  the courier delivers and the order closes
+
+journey 2 - cancel before dispatch
+  PASS  a second order can be cancelled before it ships
+  PASS  the cancelled order has released its reservation
+  PASS  a finished order cannot be cancelled again
+
+journey 3 - return and refund
+  PASS  a delivered line can be returned
+  PASS  support approves, the warehouse receives, finance refunds
+  PASS  finance reconciliation still balances
+
+access control
+  PASS  a customer cannot reach the inventory report
+  PASS  the warehouse can receive stock and it lands in the ledger
+  PASS  the oversell guard refuses more than is available
+  PASS  a customer cannot provision a staff account
+  PASS  a customer cannot read the audit ledger
+  PASS  an unauthenticated call is refused
+  PASS  an unknown endpoint answers with JSON
+
+console
+  PASS  the web console is served
+  PASS  the console stylesheet is served
+
+audit
+  PASS  the journey is traceable in the audit ledger
+
+------------------------------------------------------------
+30 passed, 0 failed
+------------------------------------------------------------
+

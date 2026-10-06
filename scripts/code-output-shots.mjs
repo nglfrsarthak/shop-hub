@@ -49,8 +49,8 @@ function run(command, args, cwd) {
 
 const JOBS = [
   {
-    name: 'SS-19-npm-test',
-    caption: 'npm test - 74 acceptance tests across 8 suites, all passing',
+    name: 'SS-24-npm-test',
+    caption: 'npm test - 78 acceptance tests across 8 suites, all passing',
     // node --test, not npm test: npm swallows the stream on Windows, so
     // capturing stdout would have produced nothing at all.
     command: 'node',
@@ -75,7 +75,7 @@ const JOBS = [
     },
   },
   {
-    name: 'SS-22-console-check',
+    name: 'SS-26-console-check',
     caption: 'node scripts/console-check.mjs - the browser client\'s formatter and error mapper',
     command: 'node',
     args: [path.join(ROOT, 'scripts', 'console-check.mjs')],
@@ -83,7 +83,7 @@ const JOBS = [
     keep: (text) => text,
   },
   {
-    name: 'SS-23-ci-run',
+    name: 'SS-27-ci-run',
     caption: 'gh run view - the CI pipeline for the pushed commit',
     command: 'gh',
     args: ['run', 'list', '--limit', '3'],
@@ -91,7 +91,7 @@ const JOBS = [
     keep: (text) => text,
   },
   {
-    name: 'SS-24-git-log',
+    name: 'SS-28-git-log',
     caption: 'git log --oneline - one epic or fix per commit',
     command: 'git',
     args: ['log', '--oneline', '-16'],
@@ -99,7 +99,7 @@ const JOBS = [
     keep: (text) => text,
   },
   {
-    name: 'SS-25-ci-first-failure',
+    name: 'SS-29-ci-first-failure',
     caption: 'Run 37274485133 - Lint fails on a hard-coded JWT_SECRET',
     // Live from the run's own log, so this is the assertion GitHub recorded
     // rather than a description of it written afterwards.
@@ -113,7 +113,7 @@ const JOBS = [
       .join('\n'),
   },
   {
-    name: 'SS-25b-check-was-wrong',
+    name: 'SS-30-check-was-wrong',
     caption: 'Run 37274799850 - the replacement check failed for its own reason',
     command: 'gh',
     args: ['run', 'view', '37274799850', '--log-failed'],
@@ -125,7 +125,7 @@ const JOBS = [
       .join('\n'),
   },
   {
-    name: 'SS-26-smoke-test',
+    name: 'SS-31-smoke-test',
     caption: 'node scripts/smoke-test.mjs - 30 checks over HTTP against the running server',
     command: 'node',
     args: [path.join(ROOT, 'scripts', 'smoke-test.mjs'), APP],
@@ -133,7 +133,7 @@ const JOBS = [
     keep: (text) => text,
   },
   {
-    name: 'SS-21-api-meta',
+    name: 'SS-25-api-meta',
     caption: 'GET /api/v1/meta - the API describing its own endpoint and table counts',
     command: 'node',
     args: ['-e', `fetch('${APP}/api/v1/meta').then(r=>r.text()).then(t=>console.log('HTTP 200\\n'+JSON.stringify(JSON.parse(t),null,2)))`],

@@ -1,0 +1,4 @@
+^[[36;1m  echo "::error::a hard-coded JWT_SECRET is committed"^[[0m
+app/tests/api.test.js:16:process.env.JWT_SECRET = 'test-secret-not-for-production';
+##[error]a hard-coded JWT_SECRET is committed
+##[error]Process completed with exit code 1.

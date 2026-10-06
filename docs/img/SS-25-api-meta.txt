@@ -1,0 +1,17 @@
+HTTP 200
+{
+  "service": "shop-hub",
+  "version": "1.0.0",
+  "currency": "INR",
+  "money_unit": "paise (integer)",
+  "roles": [
+    "customer",
+    "agent",
+    "warehouse",
+    "merchandiser",
+    "finance",
+    "admin"
+  ],
+  "endpoints": 51,
+  "tables": 18
+}
