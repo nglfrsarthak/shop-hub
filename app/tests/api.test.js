@@ -97,7 +97,7 @@ async function orderAt(target, { pay = true, sku = 'TER-MUG-01', qty = 1 } = {})
       .send({ method: 'upi', idempotency_key: `k-${orderId}-${Date.now()}${seq}` });
     assert.equal(payRes.status, 201, JSON.stringify(payRes.body));
   }
-  if (!target || target === 'placed') return { ...cust, orderId };
+  if (!target || target === 'created') return { ...cust, orderId };
 
   // picking -> packed
   for (const step of ['picking', 'packed']) {
@@ -509,7 +509,7 @@ describe('E4 - cart and orders', () => {
     await request(app).post('/api/v1/cart/items').set(as(cust.token)).send({ variant_id: v.id, qty: 2 });
     const res = await request(app).post('/api/v1/orders').set(as(cust.token)).send({});
     assert.equal(res.status, 201);
-    assert.equal(res.body.data.status, 'placed');
+    assert.equal(res.body.data.status, 'created');
     assert.match(res.body.data.code, /^SH-\d+$/);
     assert.equal(res.body.data.items.length, 1);
 
@@ -620,11 +620,13 @@ describe('E4 - cart and orders', () => {
     await request(app).post('/api/v1/cart/items').set(as(cust.token)).send({ variant_id: v.id, qty: 1 });
     const placed = await request(app).post('/api/v1/orders').set(as(cust.token)).send({});
 
-    // placed -> shipped skips picking and packing
+    // created -> shipped skips picking and packing
     const skip = await request(app).post(`/api/v1/orders/${placed.body.data.id}/status`)
       .set(as(T.vikram)).send({ status: 'shipped' });
     assert.equal(skip.status, 422);
-    assert.deepEqual(skip.body.allowed.sort(), ['cancelled', 'paid']);
+    // the plain status endpoint can move a fresh order nowhere: paying and
+    // cancelling are their own endpoints, so the legal list here is empty.
+    assert.deepEqual(skip.body.allowed, []);
     // dispatch has side effects, so the refusal points at the right endpoint
     assert.match(skip.body.reason, /moves stock or money/);
     assert.equal(skip.body.use, 'POST /api/v1/admin/orders/:id/ship');
@@ -645,7 +647,15 @@ describe('E4 - cart and orders', () => {
     const res = await request(app).post(`/api/v1/orders/${placed.body.data.id}/status`)
       .set(as(T.vikram)).send({ status: 'packed' });
     assert.equal(res.status, 422);
-    assert.deepEqual(res.body.allowed.sort(), ['cancelled', 'paid']);
+    assert.deepEqual(res.body.allowed, []);
+  });
+
+  it('lets a shipped order move no further through the status endpoint', async () => {
+    const { orderId } = await orderAt('shipped');
+    const res = await request(app).post(`/api/v1/orders/${orderId}/status`)
+      .set(as(T.vikram)).send({ status: 'delivered' });
+    assert.equal(res.status, 422);
+    assert.deepEqual(res.body.allowed, [], 'a shipped order has no allowed moves left');
   });
 
   it('keeps one open cart per customer and converts it on checkout', async () => {
@@ -711,7 +721,27 @@ describe('E5 - payments, returns and refunds', () => {
     assert.equal(res.status, 402);
     assert.equal(res.body.reason, 'card_declined');
     const order = db.prepare('SELECT status FROM orders WHERE id = ?').get(placed.body.data.id);
-    assert.equal(order.status, 'placed', 'a failed payment must not advance the order');
+    assert.equal(order.status, 'created', 'a failed payment must not advance the order');
+    const rows = db.prepare('SELECT COUNT(*) AS n FROM payments WHERE order_id = ?').get(placed.body.data.id).n;
+    assert.equal(rows, 0, 'a decline writes no payment row');
+  });
+
+  it('produces exactly one payment row for concurrent same-key requests', async () => {
+    const cust = await freshCustomer();
+    const v = variantBySku('LUM-LMP-01');
+    await request(app).post('/api/v1/cart/items').set(as(cust.token)).send({ variant_id: v.id, qty: 1 });
+    const placed = await request(app).post('/api/v1/orders').set(as(cust.token)).send({});
+    const body = { method: 'card', card_number: '4242424242424242', idempotency_key: `race-${placed.body.data.id}-${Date.now()}` };
+
+    // Fire both at once: whichever lands second must replay the first, not charge.
+    const [a, b] = await Promise.all([
+      request(app).post(`/api/v1/orders/${placed.body.data.id}/pay`).set(as(cust.token)).send(body),
+      request(app).post(`/api/v1/orders/${placed.body.data.id}/pay`).set(as(cust.token)).send(body),
+    ]);
+    assert.ok([a.status, b.status].includes(201), 'one request must capture');
+    assert.ok([a.status, b.status].includes(200), 'the other must replay');
+    const rows = db.prepare('SELECT COUNT(*) AS n FROM payments WHERE order_id = ?').get(placed.body.data.id).n;
+    assert.equal(rows, 1, 'two concurrent same-key requests must leave exactly one payment row');
   });
 
   it('insists on an idempotency key', async () => {
@@ -721,10 +751,10 @@ describe('E5 - payments, returns and refunds', () => {
     const placed = await request(app).post('/api/v1/orders').set(as(cust.token)).send({});
     const short = await request(app).post(`/api/v1/orders/${placed.body.data.id}/pay`).set(as(cust.token))
       .send({ method: 'upi', idempotency_key: 'short' });
-    assert.equal(short.status, 400);
+    assert.equal(short.status, 422);
     const none = await request(app).post(`/api/v1/orders/${placed.body.data.id}/pay`).set(as(cust.token))
       .send({ method: 'upi' });
-    assert.equal(none.status, 400);
+    assert.equal(none.status, 422);
   });
 
   it('refuses an unsupported payment method', async () => {
@@ -756,7 +786,7 @@ describe('E5 - payments, returns and refunds', () => {
     const res = await request(app).post('/api/v1/returns').set(as(cust.token))
       .send({ order_item_id: itemId, qty: 1, reason: 'changed mind' });
     assert.equal(res.status, 422);
-    assert.equal(res.body.order_status, 'placed');
+    assert.equal(res.body.order_status, 'created');
   });
 
   it('will not return more than was ordered, counting earlier requests', async () => {
@@ -793,6 +823,11 @@ describe('E5 - payments, returns and refunds', () => {
     assert.equal(approved.status, 200);
     assert.equal(stockOf(v.id).on_hand, onHandBefore, 'approval alone does not restock');
 
+    const transit = await request(app).patch(`/api/v1/returns/${returnId}/status`).set(as(T.neha))
+      .send({ status: 'in_transit' });
+    assert.equal(transit.status, 200);
+    assert.equal(stockOf(v.id).on_hand, onHandBefore, 'goods in transit are not back on the shelf yet');
+
     const received = await request(app).patch(`/api/v1/returns/${returnId}/status`).set(as(T.vikram))
       .send({ status: 'received' });
     assert.equal(received.status, 200);
@@ -823,12 +858,22 @@ describe('E5 - payments, returns and refunds', () => {
     assert.equal(skip.status, 422);
     assert.deepEqual(skip.body.allowed.sort(), ['approved', 'rejected']);
 
+    // approved -> received would skip the courier leg
     await request(app).patch(`/api/v1/returns/${created.body.data.id}/status`).set(as(T.neha))
-      .send({ status: 'rejected' }).expect(200);
+      .send({ status: 'approved' }).expect(200);
+    const jump = await request(app).patch(`/api/v1/returns/${created.body.data.id}/status`).set(as(T.neha))
+      .send({ status: 'received' });
+    assert.equal(jump.status, 422);
+    assert.deepEqual(jump.body.allowed, ['in_transit']);
+
+    await request(app).patch(`/api/v1/returns/${created.body.data.id}/status`).set(as(T.neha))
+      .send({ status: 'in_transit' }).expect(200);
+    await request(app).patch(`/api/v1/returns/${created.body.data.id}/status`).set(as(T.neha))
+      .send({ status: 'received' }).expect(200);
     const closed = await request(app).patch(`/api/v1/returns/${created.body.data.id}/status`).set(as(T.neha))
-      .send({ status: 'approved' });
+      .send({ status: 'cancelled' });
     assert.equal(closed.status, 422);
-    assert.deepEqual(closed.body.allowed, []);
+    assert.deepEqual(closed.body.allowed, ['refunded']);
   });
 
   it('shows a customer only their own returns', async () => {
@@ -913,12 +958,16 @@ describe('E6 - fulfilment', () => {
     assert.equal(dupe.status, 409);
     assert.equal(dupe.body.error, 'tracking_no already used');
 
-    await request(app).post(`/api/v1/admin/orders/${orderId}/ship`).set(as(T.vikram))
-      .send({ carrier: 'Ecom', tracking_no: `TRK${Date.now()}X${orderId}` }).expect(201);
+    const first = await request(app).post(`/api/v1/admin/orders/${orderId}/ship`).set(as(T.vikram))
+      .send({ carrier: 'Ecom', tracking_no: `TRK${Date.now()}X${orderId}` });
+    assert.equal(first.status, 201);
     const again = await request(app).post(`/api/v1/admin/orders/${orderId}/ship`).set(as(T.vikram))
       .send({ carrier: 'Ecom', tracking_no: `TRK${Date.now()}Y${orderId}` });
     assert.equal(again.status, 409);
     assert.equal(again.body.error, 'order already has a shipment');
+    // the refusal points back at the shipment that already exists
+    assert.equal(again.body.shipment_id, first.body.data.id);
+    assert.equal(again.body.tracking_no, first.body.data.tracking_no);
   });
 
   it('closes the order when the courier reports delivery', async () => {
@@ -961,6 +1010,33 @@ describe('E6 - fulfilment', () => {
     assert.ok(staff.body.data.length > 0);
     const foreign = await request(app).get('/api/v1/shipments').set(as(T.diya));
     assert.ok(!foreign.body.data.some((s) => s.order_id === orderId));
+  });
+
+  it('gives the warehouse a FIFO dispatch queue of paid and picking orders', async () => {
+    const first = await orderAt('picking', { sku: 'LUM-LMP-01', qty: 2 });
+    const second = await orderAt('picking', { sku: 'LUM-LMP-01', qty: 1 });
+
+    const res = await request(app).get('/api/v1/fulfilment/dispatch-queue').set(as(T.vikram));
+    assert.equal(res.status, 200);
+    const rows = res.body.data;
+    const mine = rows.filter((x) => x.id === first.orderId || x.id === second.orderId);
+    assert.equal(mine.length, 2, 'both picking orders are queued');
+    for (const row of mine) {
+      assert.ok(['paid', 'picking'].includes(row.status));
+      assert.ok(row.item_qty >= 1, 'the queue states the quantity to pick');
+      assert.ok(row.city, 'the queue states the ship-to city');
+      assert.ok(row.customer_name, 'the queue states the customer');
+    }
+    // oldest first
+    const idx = rows.findIndex((x) => x.id === first.orderId);
+    const jdx = rows.findIndex((x) => x.id === second.orderId);
+    assert.ok(idx < jdx, 'the older order is queued first');
+
+    // admin may look; other roles may not
+    await request(app).get('/api/v1/fulfilment/dispatch-queue').set(as(T.admin)).expect(200);
+    await request(app).get('/api/v1/fulfilment/dispatch-queue').set(as(T.neha)).expect(403);
+    await request(app).get('/api/v1/fulfilment/dispatch-queue').set(as(T.anil)).expect(403);
+    await request(app).get('/api/v1/fulfilment/dispatch-queue').set(as(T.aarav)).expect(403);
   });
 });
 
@@ -1045,13 +1121,21 @@ describe('cross-cutting invariants', () => {
   });
 
   it('has no order holding stock it does not own', async () => {
-    for (const o of db.prepare("SELECT * FROM orders WHERE status IN ('placed','paid','picking','packed')").all()) {
+    for (const o of db.prepare("SELECT * FROM orders WHERE status IN ('created','paid','picking','packed')").all()) {
       for (const line of db.prepare('SELECT * FROM order_items WHERE order_id = ?').all(o.id)) {
         const s = stockOf(line.variant_id);
         assert.ok(s, `order ${o.code} references a variant with no stock level`);
         assert.ok(s.on_hand >= 0 && s.reserved >= 0);
         assert.ok(s.on_hand - s.reserved >= 0, `order ${o.code} oversold variant ${line.sku}`);
       }
+    }
+  });
+
+  it('keeps on_hand equal to the sum of every movement', async () => {
+    for (const s of db.prepare('SELECT variant_id, on_hand FROM stock_levels').all()) {
+      const delta = db.prepare('SELECT COALESCE(SUM(delta),0) AS n FROM stock_movements WHERE variant_id = ?')
+        .get(s.variant_id).n;
+      assert.equal(delta, s.on_hand, `variant ${s.variant_id} on_hand drifted from its movement ledger`);
     }
   });
 

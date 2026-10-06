@@ -168,7 +168,7 @@ export function seed() {
     const orderId = db.prepare(`
       INSERT INTO orders (code, customer_id, status, subtotal_paise, discount_paise,
                           tax_paise, shipping_paise, total_paise, ship_to)
-      VALUES (?,?,'placed',?,?,?,?,?,?)`)
+      VALUES (?,?,'created',?,?,?,?,?,?)`)
       .run(code, customerId, totals.subtotal_paise, totals.discount_paise, totals.tax_paise,
         totals.shipping_paise, totals.total_paise,
         JSON.stringify({ label: address.label, line1: address.line1, city: address.city, pincode: address.pincode }))
@@ -180,7 +180,7 @@ export function seed() {
         .run(orderId, l.variant_id, l.sku, l.name, l.qty, l.unit_price_paise, l.qty * l.unit_price_paise);
     }
 
-    if (!plan.pay) return; // stays in `placed`, awaiting payment
+    if (!plan.pay) return; // stays in `created`, awaiting payment
 
     const result = charge({
       amount_paise: totals.total_paise, method: 'card',

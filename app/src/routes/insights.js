@@ -59,12 +59,12 @@ r.get('/dashboard', requireAuth, (req, res) => {
     finance: [
       { label: 'Gross captured', value: revenue, display: formatINR(revenue) },
       { label: 'Refunded', value: one("SELECT COALESCE(SUM(amount_paise),0) AS n FROM refunds WHERE status = 'paid'").n, display: formatINR(one("SELECT COALESCE(SUM(amount_paise),0) AS n FROM refunds WHERE status = 'paid'").n) },
-      { label: 'Failed attempts', value: one("SELECT COUNT(*) AS n FROM payments WHERE status = 'failed'").n },
-      { label: 'Open returns', value: one("SELECT COUNT(*) AS n FROM returns WHERE status IN ('requested','approved','received')").n },
+      { label: 'Failed attempts', value: one("SELECT COUNT(*) AS n FROM audit_events WHERE action = 'payment.failed'").n },
+      { label: 'Open returns', value: one("SELECT COUNT(*) AS n FROM returns WHERE status IN ('requested','approved','in_transit','received')").n },
     ],
     agent: [
-      { label: 'Orders needing action', value: one("SELECT COUNT(*) AS n FROM orders WHERE status IN ('placed','paid','picking')").n },
-      { label: 'Open returns', value: one("SELECT COUNT(*) AS n FROM returns WHERE status IN ('requested','approved')").n },
+      { label: 'Orders needing action', value: one("SELECT COUNT(*) AS n FROM orders WHERE status IN ('created','paid','picking')").n },
+      { label: 'Open returns', value: one("SELECT COUNT(*) AS n FROM returns WHERE status IN ('requested','approved','in_transit')").n },
       { label: 'In transit', value: one("SELECT COUNT(*) AS n FROM shipments WHERE status <> 'delivered'").n },
       { label: 'Delivered today', value: one("SELECT COUNT(*) AS n FROM shipments WHERE date(delivered_at) = date('now')").n },
     ],

@@ -122,7 +122,7 @@ await check('checkout creates the order and reserves the stock', async () => {
   assert.equal(res.status, 201, JSON.stringify(res.body));
   orderId = res.body.data.id;
   assert.match(res.body.data.code, /^SH-\d+$/);
-  assert.equal(res.body.data.status, 'placed');
+  assert.equal(res.body.data.status, 'created');
   assert.equal(res.body.data.allowed_transitions.sort().join(), 'cancelled,paid');
 });
 await check('paying captures the money and advances the order', async () => {
@@ -245,6 +245,11 @@ await check('support approves, the warehouse receives, finance refunds', async (
     token: support, body: { status: 'approved' },
   });
   assert.equal(approved.status, 200, JSON.stringify(approved.body));
+
+  const transit = await call('PATCH', `/api/v1/returns/${id}/status`, {
+    token: support, body: { status: 'in_transit' },
+  });
+  assert.equal(transit.status, 200, JSON.stringify(transit.body));
 
   const received = await call('PATCH', `/api/v1/returns/${id}/status`, {
     token: WAREHOUSE, body: { status: 'received' },

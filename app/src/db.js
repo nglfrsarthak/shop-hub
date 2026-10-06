@@ -112,8 +112,8 @@ export function migrate() {
       id             INTEGER PRIMARY KEY AUTOINCREMENT,
       code           TEXT    NOT NULL UNIQUE,
       customer_id    INTEGER NOT NULL REFERENCES users(id),
-      status         TEXT    NOT NULL DEFAULT 'placed'
-                     CHECK (status IN ('placed','paid','picking','packed','shipped','delivered','cancelled')),
+      status         TEXT    NOT NULL DEFAULT 'created'
+                     CHECK (status IN ('created','paid','picking','packed','shipped','delivered','cancelled')),
       subtotal_paise INTEGER NOT NULL,
       discount_paise INTEGER NOT NULL DEFAULT 0,
       tax_paise      INTEGER NOT NULL,
@@ -160,7 +160,7 @@ export function migrate() {
       qty           INTEGER NOT NULL CHECK (qty > 0),
       reason        TEXT    NOT NULL,
       status        TEXT    NOT NULL DEFAULT 'requested'
-                    CHECK (status IN ('requested','approved','received','refunded','rejected')),
+                    CHECK (status IN ('requested','approved','in_transit','received','refunded','rejected')),
       created_at    TEXT    NOT NULL DEFAULT (datetime('now'))
     );
 

@@ -20,11 +20,12 @@ const RETURNS_STAFF = ['agent', 'warehouse', 'finance', 'admin'];
 
 /** Returns follow their own lifecycle, separate from the order's. */
 export const RETURN_FLOW = {
-  requested: ['approved', 'rejected'],
-  approved:  ['received'],
-  received:  ['refunded'],
-  refunded:  [],
-  rejected:  [],
+  requested:  ['approved', 'rejected'],
+  approved:   ['in_transit'],
+  in_transit: ['received'],
+  received:   ['refunded'],
+  refunded:   [],
+  rejected:   [],
 };
 
 // ------------------------------------------------------------------- payment
@@ -54,7 +55,7 @@ r.post('/orders/:id/pay', requireAuth, (req, res) => {
   if (!idempotency_key || String(idempotency_key).length < 8) {
     // Without a key we cannot promise "exactly once", so we refuse rather than
     // quietly accepting a duplicate-charge risk.
-    return res.status(400).json({ error: 'idempotency_key of at least 8 characters is required' });
+    return res.status(422).json({ error: 'idempotency_key of at least 8 characters is required' });
   }
 
   // Replay: same key, same answer, no second charge.
@@ -73,16 +74,14 @@ r.post('/orders/:id/pay', requireAuth, (req, res) => {
   const result = charge({ amount_paise: o.total_paise, method, card_number, idempotency_key });
 
   if (result.status === 'failed') {
-    // A declined card is recorded, so support can see what was attempted.
-    const info = db.prepare(
-      'INSERT INTO payments (order_id, amount_paise, method, status, idempotency_key, failure_reason) VALUES (?,?,?,?,?,?)'
-    ).run(o.id, o.total_paise, method, 'failed', idempotency_key, result.failure_reason);
-    audit(actorId(req), 'payment', info.lastInsertRowid, 'payment.failed', {
+    // A decline never becomes a payment row. Money did not move and the order
+    // keeps its reservation; the failed attempt is evidence in the audit
+    // ledger, which is where the finance dashboard counts it from.
+    audit(actorId(req), 'order', o.id, 'payment.failed', {
       order: o.code, reason: result.failure_reason,
     });
     return res.status(402).json({
-      error: 'payment_failed', reason: result.failure_reason,
-      data: db.prepare('SELECT * FROM payments WHERE id = ?').get(info.lastInsertRowid),
+      error: 'payment_failed', reason: result.failure_reason, order_id: o.id,
     });
   }
 
@@ -238,7 +237,7 @@ r.get('/finance/reconciliation', requireAuth, requireRole(...FINANCE), (_req, re
   const sum = (sql, ...args) => db.prepare(sql).get(...args).n;
   const gross = sum("SELECT COALESCE(SUM(amount_paise),0) AS n FROM payments WHERE status = 'captured'");
   const refunded = sum("SELECT COALESCE(SUM(amount_paise),0) AS n FROM refunds WHERE status = 'paid'");
-  const failed = db.prepare("SELECT COUNT(*) AS n FROM payments WHERE status = 'failed'").get().n;
+  const failed = db.prepare("SELECT COUNT(*) AS n FROM audit_events WHERE action = 'payment.failed'").get().n;
   const pending = db.prepare("SELECT COUNT(*) AS n FROM payments WHERE status = 'pending'").get().n;
 
   // Guard rail: the refunds we have issued must never exceed what we captured.

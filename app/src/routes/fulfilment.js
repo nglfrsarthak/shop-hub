@@ -34,8 +34,13 @@ r.post('/admin/orders/:id/ship', requireAuth, requireRole(...FULFIL), (req, res)
   // the more precise diagnosis, and "illegal transition shipped -> shipped"
   // would send the operator looking at the state machine instead of the real
   // cause.
-  if (db.prepare('SELECT id FROM shipments WHERE order_id = ?').get(o.id)) {
-    return res.status(409).json({ error: 'order already has a shipment' });
+  const existing = db.prepare('SELECT id, tracking_no FROM shipments WHERE order_id = ?').get(o.id);
+  if (existing) {
+    return res.status(409).json({
+      error: 'order already has a shipment',
+      shipment_id: existing.id,
+      tracking_no: existing.tracking_no,
+    });
   }
   if (!ORDER_FLOW[o.status].includes('shipped')) {
     return res.status(422).json({ error: `illegal transition ${o.status} -> shipped`, allowed: ORDER_FLOW[o.status] });
@@ -99,6 +104,27 @@ r.post('/shipments/:id/events', requireAuth, requireRole(...FULFIL), (req, res) 
     data: db.prepare('SELECT * FROM shipments WHERE id = ?').get(s.id),
     events: db.prepare('SELECT * FROM shipment_events WHERE shipment_id = ? ORDER BY id').all(s.id),
   });
+});
+
+/**
+ * US-6.1 Dispatch queue.
+ *
+ * Orders that are paid or picking, oldest first, so the warehouse works the
+ * backlog in FIFO order. Each row carries the quantity to pick, the ship-to
+ * city and the customer's name - that is the whole picking ticket.
+ */
+r.get('/fulfilment/dispatch-queue', requireAuth, requireRole('warehouse', 'admin'), (req, res) => {
+  const rows = db.prepare(`
+    SELECT o.id, o.code, o.status, o.placed_at, o.total_paise,
+           (SELECT COALESCE(SUM(oi.qty), 0) FROM order_items oi WHERE oi.order_id = o.id) AS item_qty,
+           json_extract(o.ship_to, '$.city') AS city,
+           u.name AS customer_name
+      FROM orders o
+      JOIN users u ON u.id = o.customer_id
+     WHERE o.status IN ('paid', 'picking')
+     ORDER BY o.placed_at ASC, o.id ASC
+  `).all();
+  res.json({ data: rows });
 });
 
 r.get('/shipments', requireAuth, (req, res) => {

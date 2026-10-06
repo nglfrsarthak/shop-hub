@@ -18,7 +18,7 @@ const r = Router();
  * the rule the 422 endpoint exists to enforce.
  */
 export const ORDER_FLOW = {
-  placed:    ['paid', 'cancelled'],
+  created:   ['paid', 'cancelled'],
   paid:      ['picking', 'cancelled'],
   picking:   ['packed', 'cancelled'],
   packed:    ['shipped'],
@@ -38,7 +38,7 @@ export const ORDER_FLOW = {
  * physical inventory. Those two edges live behind their own endpoints.
  */
 export const WORKFLOW_FLOW = {
-  placed:    [],
+  created:   [],
   paid:      ['picking'],
   picking:   ['packed'],
   packed:    [],
@@ -224,7 +224,7 @@ r.post('/orders', requireAuth, requireRole('customer'), (req, res) => {
     const orderId = db.prepare(`
       INSERT INTO orders (code, customer_id, status, subtotal_paise, discount_paise,
                           tax_paise, shipping_paise, total_paise, ship_to)
-      VALUES (?,?,'placed',?,?,?,?,?,?)
+      VALUES (?,?,'created',?,?,?,?,?,?)
     `).run(code, uid, totals.subtotal_paise, totals.discount_paise,
       totals.tax_paise, totals.shipping_paise, totals.total_paise, shipTo).lastInsertRowid;
 
@@ -332,7 +332,7 @@ r.post('/orders/:id/cancel', requireAuth, (req, res) => {
 
   const result = db.transaction(() => {
     // Goods not yet shipped are still only reserved, so give them back.
-    if (o.status === 'placed' || o.status === 'paid') {
+    if (o.status === 'created' || o.status === 'paid') {
       for (const line of db.prepare('SELECT * FROM order_items WHERE order_id = ?').all(o.id)) {
         releaseStock(line.variant_id, line.qty);
       }
@@ -370,7 +370,7 @@ r.post('/orders/:id/status', requireAuth, requireRole('warehouse', 'agent', 'adm
     const elsewhere = SIDE_EFFECT_ENDPOINT[next];
     return res.status(422).json({
       error: `illegal transition ${o.status} -> ${next}`,
-      allowed: ORDER_FLOW[o.status],
+      allowed: WORKFLOW_FLOW[o.status],
       ...(elsewhere
         ? { reason: 'this transition moves stock or money and has its own endpoint', use: elsewhere }
         : {}),

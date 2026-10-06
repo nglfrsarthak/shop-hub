@@ -385,11 +385,11 @@ async function loadOrder(id) {
 
     <h3>Actions</h3>
     <div class="row-actions">
-      ${o.status === 'placed' && (isOwner || ['agent', 'finance', 'admin'].includes(state.user?.role))
+      ${o.status === 'created' && (isOwner || ['agent', 'finance', 'admin'].includes(state.user?.role))
         ? `<button class="btn btn-primary" id="pay">Pay ${inr(o.total_paise)}</button>` : ''}
       ${canCancel && ['paid', 'cancelled'].includes(o.status)
         ? `<button class="btn btn-danger" id="cancel">Cancel order</button>` : ''}
-      ${canCancel && o.status === 'placed'
+      ${canCancel && o.status === 'created'
         ? `<button class="btn btn-danger" id="cancel">Cancel order</button>` : ''}
       ${canAdvance && o.allowed_transitions.includes('picking')
         ? `<button class="btn" data-advance="picking">Start picking</button>` : ''}
@@ -461,7 +461,7 @@ async function loadOrder(id) {
 screens.returns = async () => {
   const { data } = await api('/returns');
   const staff = ['agent', 'finance', 'admin'].includes(state.user?.role);
-  const steps = { requested: ['approved', 'rejected'], approved: ['received'], received: ['refunded'], rejected: [], refunded: [] };
+  const steps = { requested: ['approved', 'rejected'], approved: ['in_transit'], in_transit: ['received'], received: ['refunded'], rejected: [], refunded: [] };
 
   return `<p class="muted">${data.length} return${data.length === 1 ? '' : 's'}</p>` + table([
     { label: 'Order', render: (x) => `<a href="#/orders/${x.order_id}">${esc(x.order_code ?? x.order_id)}</a>` },
@@ -530,8 +530,20 @@ screens.shipments = async () => {
   const next = { label_created: ['in_transit'], in_transit: ['out_for_delivery', 'delivered'], out_for_delivery: ['delivered'], delivered: [] };
 
   const packed = isStaff() ? await api('/orders?status=packed') : { data: [] };
+  // The dispatch queue is a warehouse/admin view; other roles get a 403, so the
+  // console simply does not ask for it.
+  const canQueue = ['warehouse', 'admin'].includes(state.user?.role);
+  const queue = canQueue ? await api('/fulfilment/dispatch-queue') : { data: [] };
 
   return `
+    ${queue.data.length ? `<h2>Dispatch queue</h2>${table([
+      { label: 'Order', render: (o) => `<a href="#/orders/${o.id}">${esc(o.code)}</a>` },
+      { label: 'Status', render: (o) => statusChip(o.status) },
+      { label: 'Qty', num: true, render: (o) => o.item_qty },
+      { label: 'City', render: (o) => esc(o.city ?? '') },
+      { label: 'Customer', render: (o) => esc(o.customer_name) },
+    ], queue.data)}` : (canQueue ? '<h2>Dispatch queue</h2><p class="muted">Nothing waiting to be picked.</p>' : '')}
+
     ${packed.data.length ? `<h2>Ready to dispatch</h2>${table([
       { label: 'Order', render: (o) => `<a href="#/orders/${o.id}">${esc(o.code)}</a>` },
       { label: 'Items', num: true, render: (o) => o.item_count },
