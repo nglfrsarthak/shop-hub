@@ -23,3 +23,8 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+# browser automation profiles. .shot-profile-jira holds a signed-in Jira
+# session; committing it would publish those cookies.
+.shot-profile*/
+.shot-diag*/
